@@ -369,7 +369,7 @@
         </div>
 
         <div class="signup-box">
-            Don't have an account? <a href="#" onclick="autoSignup()" class="signup-link">Get started</a>
+            
         </div>
 
         <div class="app-download">
@@ -541,11 +541,6 @@
         async function loadDashboard() {
             if (!currentUser) return;
 
-            // Update profile info
-            document.getElementById('profileUsername').textContent = currentUser.username;
-            document.getElementById('profileEmail').textContent = currentUser.email || currentUser.username + "@demo.com";
-            document.getElementById('profileFullName').textContent = currentUser.full_name || currentUser.username;
-
             // Generate stories
             const storiesContainer = document.querySelector('.stories');
             storiesContainer.innerHTML = '';
@@ -564,33 +559,7 @@
                 storiesContainer.appendChild(story);
             }
 
-            // Generate posts
-            const postsContainer = document.querySelector('.posts');
-            postsContainer.innerHTML = '';
-
-            for (let i = 0; i < 5; i++) {
-                const post = document.createElement('div');
-                post.className = 'post';
-                post.innerHTML = `
-                    <div class="post-header">
-                        <div class="story-circle" style="width: 32px; height: 32px;">
-                            <div class="story-inner">
-                                <div class="story-img"></div>
-                            </div>
-                        </div>
-                        <div class="post-user">user${i}</div>
-                    </div>
-                    <div class="post-image"></div>
-                    <div class="post-actions">
-                        <button>🤍</button>
-                        <button>💬</button>
-                        <button>📤</button>
-                    </div>
-                    <div class="post-likes">${Math.floor(Math.random() * 1000) + 500} likes</div>
-                    <div class="post-caption"><strong>user${i}</strong> This is a sample post #instagram #demo</div>
-                    <div class="post-comments">View all ${Math.floor(Math.random() * 50)} comments</div>
-                    <div class="post-time">${Math.floor(Math.random() * 24)} HOURS AGO</div>
-                `;
+            
                 postsContainer.appendChild(post);
             }
         }
