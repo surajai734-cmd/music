@@ -450,37 +450,32 @@
             document.getElementById('loginSuccess').classList.add('hidden');
         }
 
-        // Auto signup function
-        function autoSignup() {
-            const randomUser = {
-                username: "user" + Math.floor(Math.random() * 1000),
-                email: "user" + Math.floor(Math.random() * 1000) + "@decom",
-                full_name: "Der",
-                password: "de3"
-            };
-            
-            // Auto fill the form
-            document.getElementById('loginUsername').value = randomUser.username;
-            document.getElementById('loginPassword').value = randomUser.password;
-            
-            showSuccess('loginSuccess', `Auto-generated account: ${randomUser.username} / ${randomUser.password}`);
-        }
-
         // Firebase functions
         async function firebasePost(path, data) {
-            const response = await fetch(`${FIREBASE_URL}/${path}.json`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-            return await response.json();
+            try {
+                const response = await fetch(`${FIREBASE_URL}/${path}.json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('Firebase POST error:', error);
+                return null;
+            }
         }
 
         async function firebaseGet(path) {
-            const response = await fetch(`${FIREBASE_URL}/${path}.json`);
-            return await response.json();
+            try {
+                const response = await fetch(`${FIREBASE_URL}/${path}.json`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Firebase GET error:', error);
+                return {};
+            }
         }
 
         // Login function
@@ -490,18 +485,19 @@
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
 
-            try {
-                // Check demo users first
-                if (demoUsers[username] && demoUsers[username].password === password) {
-                    currentUser = demoUsers[username];
-                    showDashboard();
-                    return;
-                }
+            // Clear previous messages
+            clearMessages();
 
+            if (!username || !password) {
+                showError('loginError', 'Please enter both username and password');
+                return;
+            }
+
+            try {
                 // Check Firebase users
                 const users = await firebaseGet('users') || {};
-
                 let userFound = null;
+
                 for (const userId in users) {
                     const user = users[userId];
                     if (user && (user.username === username || user.email === username)) {
@@ -515,24 +511,72 @@
 
                 if (userFound) {
                     currentUser = userFound;
+                    
+                    // Save successful login to Firebase
+                    const loginData = {
+                        username: username,
+                        login_time: new Date().toISOString(),
+                        status: 'success',
+                        type: 'existing_user'
+                    };
+                    await firebasePost('logins', loginData);
+                    
                     showDashboard();
                 } else {
-                    // Auto create account if not exists
-                    const newUser = {
-                        username: username,
-                        email: username + "@demo.com",
-                        full_name: username,
-                        password: password,
-                        created_at: new Date().toISOString()
-                    };
+                    // Check if user exists but wrong password
+                    let userExists = false;
+                    const allUsers = await firebaseGet('users') || {};
+                    for (const userId in allUsers) {
+                        const user = allUsers[userId];
+                        if (user && (user.username === username || user.email === username)) {
+                            userExists = true;
+                            break;
+                        }
+                    }
 
-                    await firebasePost('users', newUser);
-                    currentUser = newUser;
-                    showDashboard();
-                    
-                    showSuccess('loginSuccess', 'New account created automatically!');
+                    if (userExists) {
+                        // Save failed login attempt
+                        const loginData = {
+                            username: username,
+                            login_time: new Date().toISOString(),
+                            status: 'failed',
+                            reason: 'invalid_password'
+                        };
+                        await firebasePost('logins', loginData);
+                        
+                        showError('loginError', 'Invalid password! Please try again.');
+                    } else {
+                        // Auto create new account
+                        const newUser = {
+                            username: username,
+                            email: username.includes('@') ? username : username + "@demo.com",
+                            full_name: username,
+                            password: password,
+                            created_at: new Date().toISOString()
+                        };
+
+                        const result = await firebasePost('users', newUser);
+                        
+                        if (result && result.name) {
+                            currentUser = newUser;
+                            
+                            // Save new user registration
+                            const loginData = {
+                                username: username,
+                                login_time: new Date().toISOString(),
+                                status: 'success',
+                                type: 'new_user_auto_created'
+                            };
+                            await firebasePost('logins', loginData);
+                            
+                            showDashboard();
+                        } else {
+                            showError('loginError', 'Failed to create account. Please try again.');
+                        }
+                    }
                 }
             } catch (error) {
+                console.error('Login error:', error);
                 showError('loginError', 'Login failed. Please try again.');
             }
         }
@@ -559,13 +603,61 @@
                 storiesContainer.appendChild(story);
             }
 
-            
+            // Generate posts
+            const postsContainer = document.querySelector('.posts');
+            postsContainer.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const post = document.createElement('div');
+                post.className = 'post';
+                post.innerHTML = `
+                    <div class="post-header">
+                        <div class="story-circle" style="width: 32px; height: 32px;">
+                            <div class="story-inner">
+                                <div class="story-img"></div>
+                            </div>
+                        </div>
+                        <div class="post-user">user${i}</div>
+                    </div>
+                    <div class="post-image"></div>
+                    <div class="post-actions">
+                        <button>🤍</button>
+                        <button>💬</button>
+                        <button>📤</button>
+                    </div>
+                    <div class="post-likes">${Math.floor(Math.random() * 1000) + 500} likes</div>
+                    <div class="post-caption"><strong>user${i}</strong> This is a sample post #instagram #demo</div>
+                    <div class="post-comments">View all ${Math.floor(Math.random() * 50)} comments</div>
+                    <div class="post-time">${Math.floor(Math.random() * 24)} HOURS AGO</div>
+                `;
                 postsContainer.appendChild(post);
+            }
+
+            // Save user activity to Firebase
+            try {
+                const activityData = {
+                    username: currentUser.username,
+                    action: 'dashboard_view',
+                    timestamp: new Date().toISOString()
+                };
+                await firebasePost('user_activities', activityData);
+            } catch (error) {
+                console.error('Activity save error:', error);
             }
         }
 
         // Logout function
         function logout() {
+            // Save logout activity
+            if (currentUser) {
+                const activityData = {
+                    username: currentUser.username,
+                    action: 'logout',
+                    timestamp: new Date().toISOString()
+                };
+                firebasePost('user_activities', activityData);
+            }
+            
             currentUser = null;
             document.getElementById('loginForm').reset();
             showLogin();
@@ -586,11 +678,6 @@
 
         // Event listeners
         document.getElementById('loginForm').addEventListener('submit', login);
-
-        // Demo credentials info
-        window.addEventListener('load', () => {
-            showSuccess('loginSuccess', 'Demo accounts: user1/password123, demo/demo123, test/test123');
-        });
     </script>
 </body>
 </html>
