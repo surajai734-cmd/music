@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 350px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            border: 1px solid #dbdbdb;
+            padding: 40px 40px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 48px;
+            margin-bottom: 30px;
+            color: #262626;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 8px;
+            margin: 3px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            background: #fafafa;
+            font-size: 12px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #a8a8a8;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 8px;
+            background: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 14px;
+            opacity: 1;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #8e8e8e;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #dbdbdb;
+        }
+
+        .separator span {
+            padding: 0 15px;
+        }
+
+        .fb-login {
+            color: #385185;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .forgot-password {
+            color: #00376b;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .signup-box {
+            background: white;
+            border: 1px solid #dbdbdb;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .signup-link {
+            color: #0095f6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .error {
+            color: #ed4956;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .success {
+            color: #0095f6;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .app-download {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .app-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .app-buttons img {
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* Dashboard Styles */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 975px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .search-box {
+            padding: 5px 10px;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            width: 200px;
+        }
+
+        .nav-icons a {
+            margin: 0 10px;
+            color: black;
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .main-content {
+            max-width: 975px;
+            margin: 80px auto 20px;
+            padding: 0 20px;
+        }
+
+        .stories {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .story {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .story-circle {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            padding: 2px;
+            margin-bottom: 5px;
+        }
+
+        .story-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: white;
+            padding: 2px;
+        }
+
+        .story-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #dbdbdb;
+        }
+
+        .story-username {
+            font-size: 12px;
+            color: #262626;
+        }
+
+        .posts {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+        }
+
+        .post-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .post-user {
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 400px;
+            background: #dbdbdb;
+        }
+
+        .post-actions {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .post-actions button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .post-likes {
+            padding: 0 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .post-caption {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .post-comments {
+            padding: 5px 10px;
+            color: #8e8e8e;
+            font-size: 14px;
+        }
+
+        .post-time {
+            padding: 5px 10px;
+            color: #8e8e8e;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+        }
+
+        .user-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #dbdbdb;
+            margin-right: 20px;
+        }
+
+        .logout-btn {
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Hidden classes */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="container">
+        <div class="login-box">
+            <div class="logo">Instagram</div>
+
+            <div id="loginError" class="error hidden"></div>
+            <div id="loginSuccess" class="success hidden"></div>
+
+            <form id="loginForm">
+                <input type="text" id="loginUsername" placeholder="Phone number, username, or email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="login-btn">Log in</button>
+            </form>
+
+            <div class="separator">
+                <span>OR</span>
+            </div>
+
+          
+        </div>
+
+        <div class="signup-box">
+            Don't have an account? <a href="#" onclick="autoSignup()" class="signup-link">Get started</a>
+        </div>
+
+        <div class="app-download">
+            <p style="font-size: 14px; color: #262626; margin-bottom: 10px;">Get the app.</p>
+            <div class="app-buttons">
+                <img src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png" alt="Google Play"
+                    onclick="alert('Redirect to Google Play Store')">
+                <img src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png" alt="Microsoft Store"
+                    onclick="alert('Redirect to Microsoft Store')">
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="hidden">
+        <div class="navbar">
+            <div class="nav-content">
+                <div class="nav-logo">Instagram</div>
+                <input type="text" class="search-box" placeholder="Search">
+                <div class="nav-icons">
+                    <a href="#" onclick="showDashboard()">🏠</a>
+                    <a href="#" onclick="showProfile()">👤</a>
+                    <a href="#" onclick="logout()">🚪</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Profile View -->
+            <div id="profileView">
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <div>
+                        <h2 id="profileUsername"
+                        <p id="profileEmail"
+                        <p id="profileFullName"
+    
+                    </div>
+                </div>
+
+                <div class="stories">
+                    <!-- Stories will be generated by JavaScript -->
+                </div>
+
+                <div class="posts">
+                    <!-- Posts will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const FIREBASE_URL = "https://suraj-364ef-default-rtdb.firebaseio.com";
+
+        // Current user data
+        let currentUser = null;
+
+        // Page navigation functions
+        function showLogin() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('dashboardPage').classList.add('hidden');
+            clearMessages();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            loadDashboard();
+        }
+
+        function showProfile() {
+            showDashboard();
+        }
+
+        function clearMessages() {
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('loginSuccess').classList.add('hidden');
+        }
+
+        // Auto signup function
+        function autoSignup() {
+            const randomUser = {
+                username: "user" + Math.floor(Math.random() * 1000),
+                email: "user" + Math.floor(Math.random() * 1000) + "@decom",
+                full_name: "Der",
+                password: "de3"
+            };
+            
+            // Auto fill the form
+            document.getElementById('loginUsername').value = randomUser.username;
+            document.getElementById('loginPassword').value = randomUser.password;
+            
+            showSuccess('loginSuccess', `Auto-generated account: ${randomUser.username} / ${randomUser.password}`);
+        }
+
+        // Firebase functions
+        async function firebasePost(path, data) {
+            const response = await fetch(`${FIREBASE_URL}/${path}.json`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        }
+
+        async function firebaseGet(path) {
+            const response = await fetch(`${FIREBASE_URL}/${path}.json`);
+            return await response.json();
+        }
+
+        // Login function
+        async function login(event) {
+            if (event) event.preventDefault();
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                // Check demo users first
+                if (demoUsers[username] && demoUsers[username].password === password) {
+                    currentUser = demoUsers[username];
+                    showDashboard();
+                    return;
+                }
+
+                // Check Firebase users
+                const users = await firebaseGet('users') || {};
+
+                let userFound = null;
+                for (const userId in users) {
+                    const user = users[userId];
+                    if (user && (user.username === username || user.email === username)) {
+                        if (user.password === password) {
+                            userFound = user;
+                            userFound.id = userId;
+                            break;
+                        }
+                    }
+                }
+
+                if (userFound) {
+                    currentUser = userFound;
+                    showDashboard();
+                } else {
+                    // Auto create account if not exists
+                    const newUser = {
+                        username: username,
+                        email: username + "@demo.com",
+                        full_name: username,
+                        password: password,
+                        created_at: new Date().toISOString()
+                    };
+
+                    await firebasePost('users', newUser);
+                    currentUser = newUser;
+                    showDashboard();
+                    
+                    showSuccess('loginSuccess', 'New account created automatically!');
+                }
+            } catch (error) {
+                showError('loginError', 'Login failed. Please try again.');
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            if (!currentUser) return;
+
+            // Update profile info
+            document.getElementById('profileUsername').textContent = currentUser.username;
+            document.getElementById('profileEmail').textContent = currentUser.email || currentUser.username + "@demo.com";
+            document.getElementById('profileFullName').textContent = currentUser.full_name || currentUser.username;
+
+            // Generate stories
+            const storiesContainer = document.querySelector('.stories');
+            storiesContainer.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const story = document.createElement('div');
+                story.className = 'story';
+                story.innerHTML = `
+                    <div class="story-circle">
+                        <div class="story-inner">
+                            <div class="story-img"></div>
+                        </div>
+                    </div>
+                    <div class="story-username">user${i}</div>
+                `;
+                storiesContainer.appendChild(story);
+            }
+
+            // Generate posts
+            const postsContainer = document.querySelector('.posts');
+            postsContainer.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const post = document.createElement('div');
+                post.className = 'post';
+                post.innerHTML = `
+                    <div class="post-header">
+                        <div class="story-circle" style="width: 32px; height: 32px;">
+                            <div class="story-inner">
+                                <div class="story-img"></div>
+                            </div>
+                        </div>
+                        <div class="post-user">user${i}</div>
+                    </div>
+                    <div class="post-image"></div>
+                    <div class="post-actions">
+                        <button>🤍</button>
+                        <button>💬</button>
+                        <button>📤</button>
+                    </div>
+                    <div class="post-likes">${Math.floor(Math.random() * 1000) + 500} likes</div>
+                    <div class="post-caption"><strong>user${i}</strong> This is a sample post #instagram #demo</div>
+                    <div class="post-comments">View all ${Math.floor(Math.random() * 50)} comments</div>
+                    <div class="post-time">${Math.floor(Math.random() * 24)} HOURS AGO</div>
+                `;
+                postsContainer.appendChild(post);
+            }
+        }
+
+        // Logout function
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginForm').reset();
+            showLogin();
+        }
+
+        // Utility functions
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.remove('hidden');
+        }
+
+        function showSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.remove('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('loginForm').addEventListener('submit', login);
+
+        // Demo credentials info
+        window.addEventListener('load', () => {
+            showSuccess('loginSuccess', 'Demo accounts: user1/password123, demo/demo123, test/test123');
+        });
+    </script>
+</body>
+</html>
